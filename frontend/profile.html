@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Profile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<nav>
+
+    <h1>🏥 Medicine Donation Platform</h1>
+
+    <ul>
+
+        <li><a href="index.html">Home</a></li>
+
+        <li><a href="profile.html">Profile</a></li>
+
+        <li><a href="login.html">Logout</a></li>
+
+    </ul>
+
+</nav>
+
+<section class="profile">
+
+    <div class="profile-card" id="profileViewCard">
+
+        <h2 id="profileName">Loading...</h2>
+
+        <p><strong>Email:</strong> <span id="profileEmail">...</span></p>
+
+        <p><strong>Phone:</strong> <span id="profilePhone">...</span></p>
+
+        <p><strong>Address:</strong> <span id="profileAddress">...</span></p>
+
+        <p><strong>Role:</strong> <span id="profileRole">...</span></p>
+
+        <button onclick="showEditForm()">Edit Profile</button>
+
+    </div>
+
+    <div class="profile-card" id="profileEditCard" style="display: none;">
+
+        <h2>Edit Profile</h2>
+
+        <form id="editProfileForm" style="margin-top: 20px;">
+            <div style="margin-bottom: 15px; text-align: left;">
+                <label for="editName" style="display: block; font-weight: 500; margin-bottom: 5px;">Full Name</label>
+                <input type="text" id="editName" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px;">
+            </div>
+            <div style="margin-bottom: 15px; text-align: left;">
+                <label for="editPhone" style="display: block; font-weight: 500; margin-bottom: 5px;">Phone Number</label>
+                <input type="text" id="editPhone" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px;">
+            </div>
+            <div style="margin-bottom: 20px; text-align: left;">
+                <label for="editAddress" style="display: block; font-weight: 500; margin-bottom: 5px;">Address</label>
+                <input type="text" id="editAddress" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px;">
+            </div>
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button type="submit" style="padding: 10px 20px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; background-color: #2563EB; color: white; cursor: pointer;">Save</button>
+                <button type="button" onclick="hideEditForm()" style="padding: 10px 20px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; background-color: #6C757D; color: white; cursor: pointer;">Cancel</button>
+            </div>
+        </form>
+
+    </div>
+
+</section>
+<script src="js/script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Pharmacy Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<nav>
+
+<h1>🏥 Medicine Donation Platform</h1>
+
+<ul>
+
+<li><a href="index.html">Home</a></li>
+<li><a href="pharmacy-dashboard.html">Pharmacy Dashboard</a></li>
+<li><a href="profile.html">Profile</a></li>
+<li><a href="reports.html">Reports</a></li>
+<li><a href="login.html">Logout</a></li>
+
+</ul>
+
+</nav>
+
+<section class="dashboard-header">
+
+<h2 id="welcomeHeader">Welcome Pharmacy 👨‍⚕️</h2>
+
+<p>
+
+Manage your medicine inventory and donate medicines before they expire.
+
+</p>
+
+</section>
+
+<section class="dashboard-cards">
+
+<div class="dashboard-card">
+
+<h3>Total Medicines</h3>
+
+<h1 id="statTotalMedicines">0</h1>
+
+</div>
+
+<div class="dashboard-card">
+
+<h3>Near Expiry</h3>
+
+<h1 id="statNearExpiry">0</h1>
+
+</div>
+
+<div class="dashboard-card">
+
+<h3>Donated</h3>
+
+<h1 id="statDonated">0</h1>
+
+</div>
+
+<div class="dashboard-card">
+
+<h3>Pending Donations</h3>
+
+<h1 id="statPendingDonations">0</h1>
+
+</div>
+
+</section>
+
+<section class="table-section">
+
+<h2>Medicine Inventory</h2>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Medicine</th>
+<th>Quantity</th>
+<th>Expiry Date</th>
+<th>Status</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="inventoryTableBody">
+<!-- Dynamic rows will be loaded here -->
+</tbody>
+
+</table>
+
+</section>
+
+<section class="table-section" style="margin-top: 30px;">
+<h2>Add New Medicine 📦</h2>
+<form id="addMedicineForm" style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; margin-top: 15px;">
+    <div style="flex: 2; min-width: 200px;">
+        <label for="medName" style="display: block; margin-bottom: 5px; font-weight: 500;">Medicine Name</label>
+        <input type="text" id="medName" placeholder="Enter medicine name" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px;">
+    </div>
+    <div style="flex: 1; min-width: 100px;">
+        <label for="medQty" style="display: block; margin-bottom: 5px; font-weight: 500;">Quantity</label>
+        <input type="number" id="medQty" placeholder="Qty" required min="1" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px;">
+    </div>
+    <div style="flex: 1.5; min-width: 150px;">
+        <label for="medExpiry" style="display: block; margin-bottom: 5px; font-weight: 500;">Expiry Date</label>
+        <input type="date" id="medExpiry" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px;">
+    </div>
+    <button type="submit" style="padding: 12px 25px; background-color: #16A34A; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s;">Add Medicine</button>
+</form>
+</section>
+
+<section class="table-section" style="margin-top: 30px;">
+    <h2>Inventory Breakdown 📊</h2>
+    <div style="max-width: 320px; margin: 0 auto; padding: 20px; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,.05);">
+        <canvas id="pharmacyInventoryChart"></canvas>
+    </div>
+</section>
+
+<section class="table-section" style="margin-top: 30px;">
+    <h2>NGO Wishlist / Open Requests 📋</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>NGO</th>
+                <th>Requested Medicine</th>
+                <th>Quantity Needed</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="pharmacyWishlistTableBody">
+            <!-- Wishlist items will load here -->
+        </tbody>
+    </table>
+</section>
+
+<section class="features">
+
+<h2>Recent Notifications</h2>
+
+<div class="feature-container">
+
+<div class="feature-card">
+
+<h3>⚠ Expiry Alert</h3>
+
+<p>18 medicines will expire within the next 30 days.</p>
+
+</div>
+
+<div class="feature-card">
+
+<h3>❤️ Donation Completed</h3>
+
+<p>Paracetamol donation was successfully accepted by Helping Hands NGO.</p>
+
+</div>
+
+<div class="feature-card">
+
+<h3>📦 Inventory Updated</h3>
+
+<p>Medicine inventory has been updated successfully.</p>
+
+</div>
+
+</div>
+
+</section>
+
+<footer>
+
+<p>
+
+© 2026 Medicine Donation Platform |
+Built by Gargi, Sanvika & Pavitra
+
+</p>
+
+</footer>
+
+<script src="js/script.js"></script>
+
+</body>
+
+</html>

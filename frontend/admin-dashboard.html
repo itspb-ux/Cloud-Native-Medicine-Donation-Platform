@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Admin Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<nav>
+
+<h1>🏥 Medicine Donation Platform</h1>
+
+<ul>
+
+<li><a href="index.html">Home</a></li>
+<li><a href="admin-dashboard.html">Admin Dashboard</a></li>
+<li><a href="reports.html">Reports</a></li>
+<li><a href="profile.html">Profile</a></li>
+<li><a href="login.html">Logout</a></li>
+
+</ul>
+
+</nav>
+
+<section class="dashboard-header">
+
+<h2 id="welcomeHeader">Welcome Admin 👨‍💼</h2>
+
+<p>
+
+Manage users, monitor donations and oversee the complete platform.
+
+</p>
+
+</section>
+
+<section class="dashboard-cards">
+
+<div class="dashboard-card">
+
+<h3>Total Pharmacies</h3>
+
+<h1 id="statTotalPharmacies">0</h1>
+
+</div>
+
+<div class="dashboard-card">
+
+<h3>Total NGOs</h3>
+
+<h1 id="statTotalNgos">0</h1>
+
+</div>
+
+<div class="dashboard-card">
+
+<h3>Total Donations</h3>
+
+<h1 id="statTotalDonations">0</h1>
+
+</div>
+
+<div class="dashboard-card">
+
+<h3>Pending Approvals</h3>
+
+<h1 id="statPendingApprovals">0</h1>
+
+</div>
+
+</section>
+
+<section class="table-section">
+
+<h2>User Management</h2>
+
+<table>
+<thead>
+<tr>
+
+<th>User</th>
+<th>Role</th>
+<th>Status</th>
+<th>Action</th>
+
+</tr>
+</thead>
+
+<tbody id="adminUsersTableBody">
+<!-- Dynamic rows will load here -->
+</tbody>
+
+</table>
+
+</section>
+
+<section class="table-section" style="margin-top: 30px;">
+    <h2>Automated Expiry Email Alerts ⚠️</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Recipient Pharmacy</th>
+                <th>Medicine Name</th>
+                <th>Expiry Date</th>
+                <th>Alert Subject</th>
+                <th>Sent Date</th>
+            </tr>
+        </thead>
+        <tbody id="adminAlertsTableBody">
+            <!-- Automated email alerts list will load here -->
+        </tbody>
+    </table>
+</section>
+
+<footer>
+
+<p>
+
+© 2026 Medicine Donation Platform |
+Team Ganpati Bappa Morya ❤️
+
+</p>
+
+</footer>
+
+<script src="js/script.js"></script>
+
+</body>
+
+</html>

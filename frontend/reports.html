@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Reports</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+    <nav>
+
+        <h1>🏥 Medicine Donation Platform</h1>
+
+        <ul>
+
+            <li><a href="index.html">Home</a></li>
+            <li><a href="ngo-dashboard.html">NGO Dashboard</a></li>
+            <li><a href="profile.html">Profile</a></li>
+            <li><a href="reports.html">Reports</a></li>
+            <li><a href="login.html">Logout</a></li>
+
+        </ul>
+
+    </nav>
+
+    <section class="dashboard-header">
+
+        <h2>Donation Reports 📊</h2>
+
+        <p>
+            View donation statistics and medicine distribution reports.
+        </p>
+
+    </section>
+
+    <section class="dashboard-cards">
+
+        <div class="dashboard-card">
+            <h3>Total Donations</h3>
+            <h1 id="statTotalDonations">0</h1>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Medicines Saved</h3>
+            <h1 id="statMedicinesSaved">0</h1>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>NGOs Served</h3>
+            <h1 id="statNgosServed">0</h1>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Active Pharmacies</h3>
+            <h1 id="statActivePharmacies">0</h1>
+        </div>
+
+    </section>
+
+    <section class="table-section" style="margin-top: 30px; text-align: center;">
+        <h2>Donation Distribution Analysis 📊</h2>
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,.05);">
+            <canvas id="reportsDonationChart"></canvas>
+        </div>
+    </section>
+
+    <section class="table-section">
+
+        <h2>Donation History</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Medicine</th>
+                    <th>Quantity</th>
+                    <th>NGO</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody id="reportsTableBody">
+            <!-- Dynamic rows will load here -->
+            </tbody>
+
+        </table>
+
+        <br><br>
+
+        <center>
+
+            <button onclick="downloadReport()">
+
+                Download Report
+
+            </button>
+
+        </center>
+
+    </section>
+
+    <footer>
+
+        <p>
+
+            © 2026 Medicine Donation Platform |
+            Team Ganpati Bappa Morya ❤️
+
+        </p>
+
+    </footer>
+
+    <script src="js/script.js"></script>
+
+</body>
+
+</html>
