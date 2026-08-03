@@ -6,12 +6,15 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import authRoutes from './routes/auth.routes';
+import healthRoutes from "./routes/health.routes";
 import medicinesRoutes from './routes/medicines.routes';
 import donationsRoutes from './routes/donations.routes';
 import wishlistRoutes from './routes/wishlist.routes';
 import adminRoutes from './routes/admin.routes';
 import reportsRoutes from './routes/reports.routes';
 import { checkExpiringMedicines } from './jobs/expiryAlerts';
+import { initializeDatabase } from "./db/initializeDatabase";
+import { startScheduler } from "./jobs/scheduler";
 
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
@@ -28,6 +31,7 @@ app.use(express.static(FRONTEND_PATH));
 // ==========================================
 // API ROUTES
 // ==========================================
+app.use("/health", healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/medicines', medicinesRoutes);
 app.use('/api/donations', donationsRoutes);
@@ -48,12 +52,28 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
     res.status(500).json({ error: 'Internal server error.' });
 });
 
-app.listen(PORT, async () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+import { waitForDatabase } from "./utils/waitForDatabase";
 
-    await checkExpiringMedicines();
-    const intervalMs = process.env.EXPIRY_CHECK_INTERVAL_MS
-        ? parseInt(process.env.EXPIRY_CHECK_INTERVAL_MS, 10)
-        : 60 * 60 * 1000; // 1 hour, matching the prototype
-    setInterval(checkExpiringMedicines, intervalMs);
+async function startServer() {
+
+    await waitForDatabase();
+
+    await initializeDatabase();
+
+    startScheduler();
+
+    app.listen(PORT, () => {
+
+        console.log(`Server running at http://localhost:${PORT}`);
+
+    });
+
+}
+
+startServer().catch(err => {
+
+    console.error(err);
+
+    process.exit(1);
+
 });
