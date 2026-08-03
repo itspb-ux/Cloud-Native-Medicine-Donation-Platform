@@ -20,9 +20,14 @@ COPY package*.json ./
 
 RUN npm install --omit=dev
 
+COPY package*.json ./
+
+RUN npm install
+
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/frontend ./frontend
 COPY --from=builder /app/database ./database
+COPY --from=builder /app/src ./src
 
 EXPOSE 3000
 
