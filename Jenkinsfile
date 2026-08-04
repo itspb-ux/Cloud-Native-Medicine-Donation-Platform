@@ -24,14 +24,16 @@ pipeline {
             }
         }
 
-        stage('Deploy with Docker Compose') {
-            steps {
-                sh '''
-                    docker compose down || true
-                    docker compose up -d --build
-                '''
-            }
-        }
+        stage('Deploy') {
+    steps {
+        sh '''
+        cd $WORKSPACE
+
+        docker compose down || true
+        docker compose up -d --build
+        '''
+    }
+}
 
         stage('Health Check') {
             steps {
