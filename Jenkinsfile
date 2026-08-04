@@ -24,27 +24,28 @@ pipeline {
             }
         }
 
-stage('Deploy') {
-    steps {
-        sh '''
-        cd /project
+        stage('Deploy') {
+            steps {
+                sh '''
+                set -e
 
-        docker compose down || true
+                cd /project
 
-        docker compose up -d --build
-        '''
-    }
-}
+                docker compose down -v || true
+
+                docker compose up -d --build
+                '''
+            }
+        }
 
         stage('Health Check') {
-    steps {
-        sh '''
-        sleep 20
-        curl http://localhost:3000/health
-        '''
-    }
-}
-
+            steps {
+                sh '''
+                sleep 25
+                curl http://localhost:3000/health
+                '''
+            }
+        }
     }
 
     post {
