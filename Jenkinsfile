@@ -6,12 +6,13 @@ pipeline {
 
         stage('Checkout') {
             steps {
+                sh 'rm -rf database/schema.sql || true'
                 git branch: 'main',
                     url: 'https://github.com/itspb-ux/Cloud-Native-Medicine-Donation-Platform.git'
             }
         }
 
-        sh 'ls -la database/ && file database/schema.sql'
+        
 
 
         stage('Build TypeScript') {
