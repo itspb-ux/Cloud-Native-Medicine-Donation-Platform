@@ -151,16 +151,11 @@ pipeline {
 
 
                 sh '''
-
                 echo "Checking database tables..."
 
-
-
                 docker exec medicine-postgres \
-
-                psql -U postgres -d medicine_donation -c "\\dt"
-
-
+                psql -U postgres -d medicine_donation \
+                -c "\\dt"
 
                 '''
 
