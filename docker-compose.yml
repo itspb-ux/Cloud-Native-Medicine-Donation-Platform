@@ -20,10 +20,11 @@ services:
       - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
 
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    test: ["CMD-SHELL", "pg_isready -U postgres"]
+    interval: 10s
+    timeout: 5s
+    retries: 15
+    start_period: 30s
 
   app:
     build: .
