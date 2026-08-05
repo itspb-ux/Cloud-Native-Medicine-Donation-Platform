@@ -25,18 +25,18 @@ pipeline {
         }
 
         stage('Deploy') {
-            steps {
-                sh '''
-                set -e
+    steps {
+        sh '''
+        set -e
 
-                cd /project
+        pwd
+        ls -la
 
-                docker compose down -v || true
-
-                docker compose up -d --build
-                '''
-            }
-        }
+        docker compose down -v || true
+        docker compose up -d --build
+        '''
+    }
+}
 
         stage('Health Check') {
             steps {
