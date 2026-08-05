@@ -60,7 +60,7 @@ pipeline {
 
                 for i in $(seq 1 20); do
 
-                    if curl --fail http://medicine-app:3000/health; then
+                    if curl --fail http://localhost:3000/health; then
                         echo "Application is healthy."
                         exit 0
                     fi
