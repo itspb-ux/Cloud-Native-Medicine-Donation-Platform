@@ -29,10 +29,10 @@ stage('Deploy') {
         sh '''
         set -e
 
-        cd /project
-
+        cd $WORKSPACE
+        
         docker rm -f medicine-app medicine-postgres || true
-        docker compose down -v || true
+        docker compose down || true
 
         docker compose up -d --build
 
