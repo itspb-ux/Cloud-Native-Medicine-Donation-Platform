@@ -1,219 +1,86 @@
 pipeline {
-
     agent any
-    options {
-        disableConcurrentBuilds()
+
+    environment {
+        APP_DIR = "/home/ubuntu/Cloud-Native-Medicine-Donation-Platform"
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                sh 'rm -rf database/schema.sql || true'
-                git branch: 'main',
-                    url: 'https://github.com/itspb-ux/Cloud-Native-Medicine-Donation-Platform.git'
-            }
-        }
-
-        
-
-
-        stage('Build TypeScript') {
-
-            agent {
-                docker {
-                    image 'node:20'
-                    reuseNode true
+                dir("${APP_DIR}") {
+                    checkout scm
                 }
             }
+        }
 
+        stage('Install Dependencies') {
             steps {
-
-                echo "Installing dependencies..."
-
-                sh 'npm install'
-
-                echo "Building TypeScript..."
-
-                sh 'npm run build'
+                dir("${APP_DIR}") {
+                    sh 'npm install'
+                }
             }
         }
 
-
-
-        stage('Clean Previous Deployment') {
-
+        stage('Build') {
             steps {
-
-                sh '''
-                set -e
-
-                echo "Stopping previous compose deployment..."
-
-                docker compose -p medicine-platform down -v --remove-orphans || true
-
-
-                echo "Removing old volumes..."
-
-                docker volume rm medicine-platform_postgres_data || true
-                docker volume rm medicine-tracker_postgres_data || true
-                docker volume rm medicine-tracker2_postgres_data || true
-                docker volume rm cloud-native-medicine-donation-platform_postgres_data || true
-
-                '''
+                dir("${APP_DIR}") {
+                    sh 'npm run build'
+                }
             }
         }
 
-
-
-        stage('Deploy') {
-
+        stage('Seed Database') {
             steps {
-
-                sh '''
-
-                set -e
-
-
-                echo "Starting Docker Compose..."
-
-
-                docker compose -p medicine-platform up -d --build
-
-
-
-                echo "Waiting for PostgreSQL..."
-
-
-
-                until [ "$(docker compose -p medicine-platform ps -q postgres | xargs docker inspect -f '{{.State.Health.Status}}')" = "healthy" ];
-
-                do
-
-                    sleep 5
-
-                done
-
-
-
-                echo "PostgreSQL is ready"
-
-
-                '''
+                dir("${APP_DIR}") {
+                    sh 'npm run db:seed'
+                }
             }
         }
 
-
-
-
-        stage('Database Verification') {
-
+        stage('Restart Application') {
             steps {
-
-                sh '''
-
-                echo "Checking database tables..."
-
-
-                docker compose -p medicine-platform exec -T postgres \
-                psql -U postgres -d medicine_donation -c "\\dt"
-
-
-                '''
-            }
-        }
-
-
-
-
-        stage('Application Health Check') {
-
-            steps {
-
-                sh '''
-
-                echo "Waiting for application startup..."
-
-
-                for i in $(seq 1 20)
-
-                do
-
-
-                    if curl --fail http://localhost:3000/health;
-
-                    then
-
-                        echo "Application is healthy"
-
-                        exit 0
-
+                dir("${APP_DIR}") {
+                    sh '''
+                    if pm2 list | grep -q medicine-app; then
+                        pm2 restart medicine-app
+                    else
+                        pm2 start npm --name medicine-app -- start
                     fi
 
-
-                    sleep 5
-
-
-                done
-
-
-
-                echo "Application failed"
-
-
-
-                docker compose -p medicine-platform logs app
-
-
-
-                exit 1
-
-
-                '''
+                    pm2 save
+                    '''
+                }
             }
         }
 
+        stage('Health Check') {
+            steps {
+                sh '''
+                sleep 5
+                curl --fail http://localhost:3000/health
+                '''
+            }
+        }
     }
-
-
 
     post {
 
-
         success {
-
-            echo '==================================='
-            echo ' Application deployed successfully '
-            echo '==================================='
-
+            echo "===================================="
+            echo " Deployment Successful "
+            echo "===================================="
         }
-
-
 
         failure {
-
-            echo '==================================='
-            echo ' Deployment failed '
-            echo '==================================='
-
+            echo "===================================="
+            echo " Deployment Failed "
+            echo "===================================="
 
             sh '''
-
-            echo "APP LOGS"
-
-            docker compose -p medicine-platform logs app || true
-
-
-
-            echo "POSTGRES LOGS"
-
-            docker compose -p medicine-platform logs postgres || true
-
-
+            pm2 logs medicine-app --lines 50 || true
             '''
-
         }
-
     }
-
 }
