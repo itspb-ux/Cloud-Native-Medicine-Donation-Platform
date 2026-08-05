@@ -55,8 +55,19 @@ stage('Deploy') {
         stage('Health Check') {
     steps {
         sh '''
-        sleep 10
-        curl --fail http://localhost:3000/health
+        echo "Waiting for application..."
+
+        for i in {1..12}; do
+          if curl --fail http://172.17.0.1:3000/health; then
+            echo "Application is healthy!"
+            exit 0
+          fi
+          echo "Retrying in 5 seconds..."
+          sleep 5
+        done
+
+        echo "Health check failed!"
+        exit 1
         '''
     }
 }
