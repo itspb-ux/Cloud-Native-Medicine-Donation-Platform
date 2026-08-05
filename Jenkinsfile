@@ -2,36 +2,24 @@ pipeline {
 
     agent any
 
-
     stages {
 
-
         stage('Checkout') {
-
             steps {
-
                 git branch: 'main',
                     url: 'https://github.com/itspb-ux/Cloud-Native-Medicine-Donation-Platform.git'
-
             }
-
         }
-
 
 
         stage('Build TypeScript') {
 
             agent {
-
                 docker {
-
                     image 'node:20'
                     reuseNode true
-
                 }
-
             }
-
 
             steps {
 
@@ -39,15 +27,11 @@ pipeline {
 
                 sh 'npm install'
 
-
                 echo "Building TypeScript..."
 
                 sh 'npm run build'
-
             }
-
         }
-
 
 
 
@@ -56,51 +40,29 @@ pipeline {
             steps {
 
                 sh '''
-
                 set -e
 
-
-                echo "Stopping old containers..."
-
-
-                docker rm -f medicine-app medicine-postgres || true
-
-
-
-                echo "Removing old compose deployment..."
-
+                echo "Stopping previous compose deployment..."
 
                 docker compose -p medicine-platform down -v --remove-orphans || true
 
 
-
-                echo "Removing old database volumes..."
-
+                echo "Removing old volumes..."
 
                 docker volume rm medicine-platform_postgres_data || true
-
                 docker volume rm medicine-tracker_postgres_data || true
-
                 docker volume rm medicine-tracker2_postgres_data || true
-
                 docker volume rm cloud-native-medicine-donation-platform_postgres_data || true
 
-
-
                 '''
-
             }
-
         }
-
 
 
 
         stage('Deploy') {
 
-
             steps {
-
 
                 sh '''
 
@@ -108,7 +70,6 @@ pipeline {
 
 
                 echo "Starting Docker Compose..."
-
 
 
                 docker compose -p medicine-platform up -d --build
@@ -119,7 +80,7 @@ pipeline {
 
 
 
-                until [ "$(docker inspect -f '{{.State.Health.Status}}' medicine-postgres)" = "healthy" ];
+                until [ "$(docker compose -p medicine-platform ps -q postgres | xargs docker inspect -f '{{.State.Health.Status}}')" = "healthy" ];
 
                 do
 
@@ -132,52 +93,40 @@ pipeline {
                 echo "PostgreSQL is ready"
 
 
-
                 '''
-
-
             }
-
         }
-
 
 
 
 
         stage('Database Verification') {
 
-
             steps {
 
-
                 sh '''
+
                 echo "Checking database tables..."
 
-                docker exec medicine-postgres \
-                psql -U postgres -d medicine_donation \
-                -c "\\dt"
+
+                docker compose -p medicine-platform exec -T postgres \
+                psql -U postgres -d medicine_donation -c "\\dt"
+
 
                 '''
-
             }
-
         }
-
 
 
 
 
         stage('Application Health Check') {
 
-
             steps {
-
 
                 sh '''
 
-
                 echo "Waiting for application startup..."
-
 
 
                 for i in $(seq 1 20)
@@ -185,19 +134,15 @@ pipeline {
                 do
 
 
-
                     if curl --fail http://localhost:3000/health;
 
                     then
-
 
                         echo "Application is healthy"
 
                         exit 0
 
-
                     fi
-
 
 
                     sleep 5
@@ -207,31 +152,22 @@ pipeline {
 
 
 
-
                 echo "Application failed"
 
 
 
-                docker logs medicine-app
+                docker compose -p medicine-platform logs app
 
 
 
                 exit 1
 
 
-
                 '''
-
-
             }
-
-
         }
 
-
-
     }
-
 
 
 
@@ -240,13 +176,9 @@ pipeline {
 
         success {
 
-
             echo '==================================='
-
             echo ' Application deployed successfully '
-
             echo '==================================='
-
 
         }
 
@@ -254,11 +186,8 @@ pipeline {
 
         failure {
 
-
             echo '==================================='
-
             echo ' Deployment failed '
-
             echo '==================================='
 
 
@@ -266,20 +195,19 @@ pipeline {
 
             echo "APP LOGS"
 
-            docker logs medicine-app || true
+            docker compose -p medicine-platform logs app || true
+
 
 
             echo "POSTGRES LOGS"
 
-            docker logs medicine-postgres || true
+            docker compose -p medicine-platform logs postgres || true
+
 
             '''
 
-
         }
 
-
     }
-
 
 }
