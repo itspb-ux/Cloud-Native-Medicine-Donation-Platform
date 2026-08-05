@@ -29,12 +29,13 @@ stage('Deploy') {
         sh '''
         set -e
 
-        cd $WORKSPACE
-        
-        docker rm -f medicine-app medicine-postgres || true
-        docker compose down || true
+        cd "$WORKSPACE"
 
-        docker compose up -d --build
+        docker rm -f medicine-app medicine-postgres || true
+
+        docker compose -p medicine-platform down || true
+
+        docker compose -p medicine-platform up -d --build
 
         until [ "$(docker inspect -f '{{.State.Health.Status}}' medicine-postgres)" = "healthy" ]; do
             sleep 5
@@ -42,7 +43,6 @@ stage('Deploy') {
         '''
     }
 }
-
        stage('Health Check') {
     steps {
         sh '''
