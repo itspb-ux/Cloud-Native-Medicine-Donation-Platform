@@ -52,21 +52,18 @@ stage('Deploy') {
     }
 }
 
-        stage('Health Check') {
+       stage('Health Check') {
     steps {
         sh '''
-        echo "Waiting for application..."
-
-        for i in {1..12}; do
-          if curl --fail http://172.17.0.1:3000/health; then
-            echo "Application is healthy!"
-            exit 0
-          fi
-          echo "Retrying in 5 seconds..."
-          sleep 5
+        for i in $(seq 1 12); do
+            if docker exec medicine-app curl --fail http://localhost:3000/health; then
+                echo "Application is healthy."
+                exit 0
+            fi
+            sleep 5
         done
 
-        echo "Health check failed!"
+        docker logs medicine-app
         exit 1
         '''
     }
