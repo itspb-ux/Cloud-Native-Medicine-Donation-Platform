@@ -11,6 +11,8 @@ pipeline {
             }
         }
 
+        sh 'ls -la database/ && file database/schema.sql'
+
 
         stage('Build TypeScript') {
 
