@@ -4,72 +4,138 @@ pipeline {
     environment {
         SERVER = "ubuntu@54.221.18.30"
         APP_DIR = "/home/ubuntu/Cloud-Native-Medicine-Donation-Platform"
+        IMAGE_NAME = "medicine-app:latest"
+        DEPLOYMENT = "medicine-app"
     }
 
     stages {
 
-        stage('Deploy') {
+        stage('Checkout') {
             steps {
+                echo "===== Checking out latest code ====="
+                checkout scm
+            }
+        }
+
+        stage('Deploy to EC2') {
+            steps {
+
                 sshagent(credentials: ['ec2-ssh']) {
+
                     sh """
-ssh -o StrictHostKeyChecking=no ${SERVER} << EOF
-set -e
+                        ssh -o StrictHostKeyChecking=no ${SERVER} << 'EOF'
 
-cd ${APP_DIR}
+                        set -e
 
-echo "===== Pulling latest code ====="
-git pull origin main
+                        echo "======================================"
+                        echo "      MEDICINE APP CI/CD DEPLOYMENT"
+                        echo "======================================"
 
-echo "===== Installing dependencies ====="
-npm install
+                        cd ${APP_DIR}
 
-echo "===== Building project ====="
-npm run build
+                        echo ""
+                        echo "===== Pulling latest code ====="
+                        git pull origin main
 
-echo "===== Restarting application ====="
-pm2 restart medicine-app
+                        echo ""
+                        echo "===== Building Docker image ====="
+                        docker build -t ${IMAGE_NAME} .
 
-echo "===== Waiting for application ====="
+                        echo ""
+                        echo "===== Loading image into Minikube ====="
+                        minikube image load ${IMAGE_NAME} --overwrite=true
 
-count=0
+                        echo ""
+                        echo "===== Restarting Kubernetes deployment ====="
+                        kubectl rollout restart deployment ${DEPLOYMENT}
 
-until curl -fs http://127.0.0.1:3000/health > /dev/null
-do
-    count=\$((count+1))
+                        echo ""
+                        echo "===== Waiting for Kubernetes rollout ====="
+                        kubectl rollout status deployment ${DEPLOYMENT} --timeout=180s
 
-    if [ \$count -ge 15 ]; then
-        echo "Application failed to start."
-        pm2 status
-        pm2 logs medicine-app --lines 50 --nostream || true
-        exit 1
-    fi
+                        echo ""
+                        echo "===== Checking Kubernetes pods ====="
+                        kubectl get pods
 
-    echo "Waiting... (\$count/15)"
-    sleep 2
-done
+                        echo ""
+                        echo "===== Checking Kubernetes services ====="
+                        kubectl get svc
 
-echo "===== Health Check Passed ====="
-curl http://127.0.0.1:3000/health
+                        echo ""
+                        echo "===== Checking application health ====="
 
-echo "===== Deployment Successful ====="
-EOF
-"""
+                        count=0
+
+                        until curl -fs http://127.0.0.1/health > /dev/null
+                        do
+                            count=\\$((count+1))
+
+                            if [ \\$count -ge 30 ]; then
+                                echo "Application health check failed."
+
+                                echo ""
+                                echo "===== Pod Status ====="
+                                kubectl get pods
+
+                                echo ""
+                                echo "===== Application Logs ====="
+                                kubectl logs deployment/${DEPLOYMENT} --tail=100 || true
+
+                                exit 1
+                            fi
+
+                            echo "Waiting for application... (\\$count/30)"
+                            sleep 2
+                        done
+
+                        echo ""
+                        echo "===== Health Check Passed ====="
+                        curl http://127.0.0.1/health
+
+                        echo ""
+                        echo "===== Deployment Successful ====="
+
+                        EOF
+                    """
                 }
             }
         }
     }
 
     post {
+
         success {
-            echo "==================================="
-            echo "Deployment Successful"
-            echo "==================================="
+            echo """
+            ==========================================
+                    DEPLOYMENT SUCCESSFUL
+            ==========================================
+            Application deployed using:
+
+            GitHub
+               ↓
+            Jenkins
+               ↓
+            Docker
+               ↓
+            Minikube
+               ↓
+            Kubernetes
+               ↓
+            Nginx
+               ↓
+            Public IP
+            ==========================================
+            """
         }
 
         failure {
-            echo "==================================="
-            echo "Deployment Failed"
-            echo "==================================="
+            echo """
+            ==========================================
+                    DEPLOYMENT FAILED
+            ==========================================
+            Check the Jenkins console output.
+            ==========================================
+            """
         }
     }
 }
