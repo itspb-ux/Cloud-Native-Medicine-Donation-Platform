@@ -14,19 +14,23 @@ stages {
     stage('Deploy to EC2') {
         steps {
             sshagent(credentials: ['ec2-ssh']) {
-                sh '''
-                    ssh -o StrictHostKeyChecking=no ${SERVER} << 'EOF'
+
+                sh """
+                    ssh -o StrictHostKeyChecking=no ${SERVER} << EOF
+
                     set -e
+
+                    echo "===== DEPLOYMENT STARTED ====="
 
                     cd ${APP_DIR}
 
-                    echo "===== Pulling latest code ====="
+                    echo "===== Pulling latest code from GitHub ====="
                     git pull origin main
 
                     echo "===== Building Docker image ====="
                     docker build -t ${IMAGE} .
 
-                    echo "===== Loading image into Minikube ====="
+                    echo "===== Loading Docker image into Minikube ====="
                     minikube image load ${IMAGE}
 
                     echo "===== Restarting Kubernetes deployment ====="
@@ -35,49 +39,57 @@ stages {
                     echo "===== Waiting for Kubernetes rollout ====="
                     kubectl rollout status deployment ${DEPLOYMENT} --timeout=120s
 
-                    echo "===== Checking pods ====="
+                    echo "===== Checking Kubernetes pods ====="
                     kubectl get pods
 
-                    echo "===== Checking application health ====="
+                    echo "===== Waiting for application health ====="
+
                     count=0
 
                     until curl -fs http://127.0.0.1:3000/health > /dev/null
                     do
-                        count=$((count+1))
+                        count=\$((count+1))
 
-                        if [ $count -ge 30 ]; then
-                            echo "Application health check failed."
+                        if [ \$count -ge 30 ]; then
+                            echo "===== HEALTH CHECK FAILED ====="
                             kubectl get pods
                             kubectl logs deployment/${DEPLOYMENT} --tail=50 || true
                             exit 1
                         fi
 
-                        echo "Waiting for application... ($count/30)"
+                        echo "Application not ready (\$count/30)..."
                         sleep 2
                     done
 
-                    echo "===== Health Check Passed ====="
+                    echo "===== HEALTH CHECK PASSED ====="
                     curl http://127.0.0.1:3000/health
 
-                    echo "===== Deployment Successful ====="
+                    echo ""
+                    echo "===== FINAL POD STATUS ====="
+                    kubectl get pods
+
+                    echo ""
+                    echo "===== DEPLOYMENT SUCCESSFUL ====="
+
                     EOF
-                '''
+                """
             }
         }
     }
 }
 
 post {
+
     success {
-        echo "==================================="
-        echo "Deployment Successful"
-        echo "==================================="
+        echo "======================================"
+        echo "     DEPLOYMENT SUCCESSFUL"
+        echo "======================================"
     }
 
     failure {
-        echo "==================================="
-        echo "Deployment Failed"
-        echo "==================================="
+        echo "======================================"
+        echo "       DEPLOYMENT FAILED"
+        echo "======================================"
     }
 }
 ```
